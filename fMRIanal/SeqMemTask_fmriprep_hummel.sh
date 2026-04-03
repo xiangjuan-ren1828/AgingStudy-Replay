@@ -30,6 +30,7 @@ SUBJ=${SUBJECTS[$SLURM_ARRAY_TASK_ID]}
 IMG=/usw/u/bbc7806/fmriprep-23.1.3.sif
 BIDS_DIR=/beegfs/u/bbc7806/AgingStudy/AgingStudy-fMRI-data/fMRI-PreprocessedData
 OUT_DIR=${BIDS_DIR}/sub-${SUBJ}/output
+WORK_DIR=/beegfs/u/bbc7806/AgingStudy/fmriprep_work/sub-${SUBJ}
 LICENSE_SRC=/beegfs/u/bbc7806/AgingStudy/AgingStudy-fMRI-data/license.txt
 LICENSE_DEST=/opt/freesurfer/license.txt
 
@@ -37,8 +38,9 @@ LICENSE_DEST=/opt/freesurfer/license.txt
 source /sw/batch/init.sh
 module switch env apptainer/1.2.5
 
-# Create output directory if it doesn't exist
+# Create output and work directories if they don't exist
 mkdir -p ${OUT_DIR}
+mkdir -p ${WORK_DIR}
 
 # Remove macOS metadata files that break BIDS indexing
 find ${BIDS_DIR} -name "._*" -delete
@@ -47,10 +49,17 @@ find ${BIDS_DIR} -name "._*" -delete
 apptainer run --home /beegfs/u/bbc7806 --cleanenv \
   -B ${BIDS_DIR}:${BIDS_DIR} \
   -B ${OUT_DIR}:${OUT_DIR} \
+  -B ${WORK_DIR}:${WORK_DIR} \
   -B ${LICENSE_SRC}:${LICENSE_DEST} \
   ${IMG} \
   ${BIDS_DIR} ${OUT_DIR} participant \
   --participant-label ${SUBJ} \
+  --work-dir ${WORK_DIR} \
   --fs-license-file ${LICENSE_DEST} \
   --mem_mb 50000 --nthreads 12 --omp-nthreads 8 \
   --output-spaces T1w MNI152NLin6Asym MNI152NLin2009cAsym fsnative fsaverage
+
+# Clean up work directory after successful completion
+echo "fMRIPrep finished for sub-${SUBJ}. Cleaning up work directory..."
+rm -rf ${WORK_DIR}
+echo "Work directory cleaned for sub-${SUBJ}."
