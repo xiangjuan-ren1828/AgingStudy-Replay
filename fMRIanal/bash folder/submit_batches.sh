@@ -5,13 +5,21 @@
 SCRIPT=SeqMemTask_fmriprep_hummel.sh
 
 # Define batches as "start-end" index ranges (total 111 subjects, indices 0-110)
+# BATCHES=(
+#   "0-19"
+#   "20-39"
+#   "40-59"
+#   "60-79"
+#   "80-99"
+#   "100-110"
+# )
 BATCHES=(
-  "0-19"
-  "20-39"
-  "40-59"
-  "60-79"
-  "80-99"
-  "100-110"
+  "80-84"
+  "85-89"
+  "90-94"
+  "95-99"
+  "100-104"
+  "105-110"
 )
 
 PREV_JOB_ID=""
